@@ -1,0 +1,19 @@
+
+C
+settings.gradle.kts,7/4/749edfcc96398253e5b3416184e95c46621da850
+D
+app/build.gradle.kts,d/2/d2a4383452aad84a18429a5844d31330a012a9e6
+w
+Gapp/src/main/java/com/example/tracker_client/dto/ArrivalTimeResponse.kt,8/0/80d2127f7a624a60e299a57dd31e55ef2744c751
+~
+Napp/src/main/java/com/example/tracker_client/dto/BusStopCoordinatesResponse.kt,7/d/7d10ba87f69c6971b4cd74d418e43659a0d764a0
+s
+Capp/src/main/java/com/example/tracker_client/api/TripTrackingApi.kt,a/f/af7764354b1553541b1abcfad8e26d2a0c10a479
+f
+6app/src/main/java/com/example/tracker_client/Module.kt,a/0/a04effae6a967f2e326077d0987812083be9f2c7
+@
+build.gradle.kts,d/b/dbcff70658daf80b53ce624f6adcaa529df5ed8d
+P
+ app/src/main/AndroidManifest.xml,8/c/8c55c3ccc257e5907959013f99656e4c8ec3903e
+†
+Vapp/src/main/java/com/example/tracker_client/repository/TrackerClientRepositoryImpl.kt,4/6/466b4768f0ac4bf0a9ecf1a3576cd9144272ccf3
