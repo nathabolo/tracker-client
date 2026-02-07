@@ -14,6 +14,8 @@ class TrackerClientRepositoryImpl(
     private val gson: Gson
 ) : ITripTrackingRepository {
 
+    private val recentSearches = LinkedHashSet<String>()
+
     override suspend fun getArrivalTime(arrivalId: String): Result<ArrivalTime> {
         return try {
             val response = trackerApi.getArrivalTime(arrivalId)
@@ -48,18 +50,24 @@ class TrackerClientRepositoryImpl(
         }
     }
 
+    override fun getRecentSearches(): List<String> =
+        recentSearches.toList().reversed()
+
     override suspend fun searchStopPoints(query: String): Result<List<StopPoint>> {
         return try {
             val response = trackerApi.searchStopPoints(query)
             if (!response.isSuccessful) {
-                Result.failure(Exception("Api Error: ${response.code} + ${response.message}"))
+                Result.failure(Exception("API error"))
             } else {
-                val bodyString = response.body?.string()
+                val body = response.body?.string()
                 val type = object : TypeToken<List<StopPoint>>() {}.type
-                val data = gson.fromJson<List<StopPoint>>(bodyString, type)
+                val data = gson.fromJson<List<StopPoint>>(body, type)
+
                 data?.let {
+                    recentSearches.remove(query)
+                    recentSearches.add(query)
                     Result.success(it)
-                } ?: Result.failure(Exception("Invalid Response"))
+                } ?: Result.failure(Exception("Invalid response"))
             }
         } catch (e: Exception) {
             Result.failure(e)
