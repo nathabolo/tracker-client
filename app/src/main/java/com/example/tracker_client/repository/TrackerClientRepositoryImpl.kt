@@ -72,8 +72,10 @@ class TrackerClientRepositoryImpl(
             if (!response.isSuccessful) {
                 Result.failure(Exception("Api Error: ${response.code} + ${response.message}"))
             } else {
-                val bodyString = response.body?.string()
+                val body = response.body ?: return Result.failure(Exception("Invalid Response"))
+                val bodyString = body.string()
                 val data = gson.fromJson(bodyString, RouteJouney::class.java)
+
                 data?.toEntity()?.let {
                     Result.success(it)
                 } ?: Result.failure(Exception("Invalid Response"))

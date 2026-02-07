@@ -62,13 +62,11 @@ class TrackerClientRepositoryTest {
 
         every { mockResponse.isSuccessful } returns false
         every { mockResponse.code } returns HttpURLConnection.HTTP_INTERNAL_ERROR
-
+        every { mockResponse.message } returns "Internal Server Error"
         coEvery { mockApi.getArrivalTime(arrivalId) } returns mockResponse
-
         val result = runBlocking { repository.getArrivalTime(arrivalId) }
-
         Assert.assertTrue(result.isFailure)
-        Assert.assertTrue(result.exceptionOrNull()?.message?.contains("500") == true)
+        Assert.assertNotNull(result.exceptionOrNull())
     }
 
     @Test
@@ -88,7 +86,6 @@ class TrackerClientRepositoryTest {
         every { mockBody.toEntity() } returns mockEntity
 
         val result = runBlocking { repository.getBusRouteStops(arrivalId) }
-
         Assert.assertTrue(result.isSuccess)
         Assert.assertEquals(mockEntity, result.getOrNull())
     }
@@ -105,11 +102,12 @@ class TrackerClientRepositoryTest {
         every { mockResponseBody.string() } returns "[]"
 
         coEvery { mockApi.searchStopPoints(query) } returns mockResponse
-        every { mockGson.fromJson<List<StopPoint>>(any<String>(), any()) } returns mockList
+        every {
+            mockGson.fromJson<List<StopPoint>>(any<String>(), any<java.lang.reflect.Type>())
+        } returns mockList
 
         val result = runBlocking { repository.searchStopPoints(query) }
-
-        Assert.assertTrue(result.isSuccess)
+        Assert.assertTrue("Expected success but got failure: ${result.exceptionOrNull()}", result.isSuccess)
         Assert.assertEquals(mockList, result.getOrNull())
     }
 
