@@ -1,13 +1,14 @@
 package com.example.tracker_client.repository
 
 import com.example.tracker_client.api.ITripTrackingApi
+import com.example.tracker_client.dto.StopPointSearchResponse
+import com.example.tracker_client.dto.toDomain
 import com.example.tracker_domain.entity.ArrivalTime
 import com.example.tracker_domain.entity.BusStopCoordinates
 import com.example.tracker_domain.entity.RouteJouney
 import com.example.tracker_domain.entity.StopPoint
 import com.example.tracker_domain.repository.ITripTrackingRepository
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 class TrackerClientRepositoryImpl(
     private val trackerApi: ITripTrackingApi,
@@ -52,27 +53,52 @@ class TrackerClientRepositoryImpl(
 
     override fun getRecentSearches(): List<String> =
         recentSearches.toList().reversed()
-
     override suspend fun searchStopPoints(query: String): Result<List<StopPoint>> {
         return try {
             val response = trackerApi.searchStopPoints(query)
             if (!response.isSuccessful) {
-                Result.failure(Exception("API error"))
+                Result.failure(Exception("API error: ${response.code}"))
             } else {
-                val body = response.body?.string()
-                val type = object : TypeToken<List<StopPoint>>() {}.type
-                val data = gson.fromJson<List<StopPoint>>(body, type)
+                val bodyString = response.body?.string()
+                    ?: return Result.failure(Exception("Empty response"))
 
-                data?.let {
-                    recentSearches.remove(query)
-                    recentSearches.add(query)
-                    Result.success(it)
-                } ?: Result.failure(Exception("Invalid response"))
+                val searchResponse =
+                    gson.fromJson(bodyString, StopPointSearchResponse::class.java)
+                val results: List<StopPoint> =
+                    searchResponse.matches.map { it.toDomain() }
+
+                recentSearches.remove(query)
+                recentSearches.add(query)
+
+                Result.success(results)
             }
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+
+
+//    override suspend fun searchStopPoints(query: String): Result<List<StopPoint>> {
+//        return try {
+//            val response = trackerApi.searchStopPoints(query)
+//            if (!response.isSuccessful) {
+//                Result.failure(Exception("API error"))
+//            } else {
+//                val body = response.body?.string()
+//                val type = object : TypeToken<List<StopPoint>>() {}.type
+//                val data = gson.fromJson<List<StopPoint>>(body, type)
+//
+//                data?.let {
+//                    recentSearches.remove(query)
+//                    recentSearches.add(query)
+//                    Result.success(it)
+//                } ?: Result.failure(Exception("Invalid response"))
+//            }
+//        } catch (e: Exception) {
+//            Result.failure(e)
+//        }
+//    }
 
     override suspend fun getJourney(from: String, to: String): Result<RouteJouney> {
         return try {

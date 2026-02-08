@@ -9,4 +9,8 @@ data class BusStopCoordinatesResponse(
     @SerializedName("latitude") val latitude: Double,
     @SerializedName("longitude") val longitude: Double,
     @SerializedName("movementTime") val movementTime: Int
-)
+) {
+   fun toEntity() = BusStopCoordinatesResponse(
+       vehicleId, latitude, longitude, movementTime
+   )
+}
