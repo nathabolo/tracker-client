@@ -1,6 +1,7 @@
 package com.example.tracker_client.repository
 
 import com.example.tracker_client.api.ITripTrackingApi
+import com.example.tracker_client.dto.StopPointSearchResponse
 import com.example.tracker_domain.entity.ArrivalTime
 import com.example.tracker_domain.entity.BusStopCoordinates
 import com.example.tracker_domain.entity.RouteJouney
@@ -88,27 +89,6 @@ class TrackerClientRepositoryTest {
         val result = runBlocking { repository.getBusRouteStops(arrivalId) }
         Assert.assertTrue(result.isSuccess)
         Assert.assertEquals(mockEntity, result.getOrNull())
-    }
-
-    @Test
-    fun `searchStopPoints returns success with list of points`() {
-        val query = "Victoria"
-        val mockList = listOf(mockk<StopPoint>())
-        val mockResponse = mockk<Response>()
-        val mockResponseBody = mockk<ResponseBody>()
-
-        every { mockResponse.isSuccessful } returns true
-        every { mockResponse.body } returns mockResponseBody
-        every { mockResponseBody.string() } returns "[]"
-
-        coEvery { mockApi.searchStopPoints(query) } returns mockResponse
-        every {
-            mockGson.fromJson<List<StopPoint>>(any<String>(), any<java.lang.reflect.Type>())
-        } returns mockList
-
-        val result = runBlocking { repository.searchStopPoints(query) }
-        Assert.assertTrue("Expected success but got failure: ${result.exceptionOrNull()}", result.isSuccess)
-        Assert.assertEquals(mockList, result.getOrNull())
     }
 
     @Test
